@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h2>My Skills</h2>
+    <ul>
+<li>HTML</li>
+<li>CSS</li>
+<li>JavaScript</li>
+    </ul>
+
+    <h2>Class Schedule</h2>
+    <table border="1">
+        <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Subject</th>
+        </tr>
+        <tr>
+            <td>Monday</td>
+            <td>9:00 AM - 10:30 AM</td>
+            <td>Web Technology</td>
+        </tr>
+</table>
+
+<h2>Media Section</h2>
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/640px-HTML5_logo_and_wordmark.svg.png"
+alt="HTML5 Logo" width="200">
+
+<h3>Embedded Video</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/2u08HbxWnuc?si=lADdoCSnFM4sH7BP" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<h3>Online Audio</h3>
+<audio controls>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+<form action="submit.html" method="post">
+<!--Full Name-->
+<label for="fullname">Full Name:</label>
+<input type="text" id="fullname" name="fullname" 
+pattern="[A-Za-z]+"
+title="Letters and spaces only"
+maxlength="50"
+placeholder="Enter your full name"
+autofocus
+required>
+<br>
+
+<!--Email-->
+<label for="email">Email:</label>
+<input type="email" id="email" name="email"
+placeholder="example@gmail.com"
+required>
+
+<br>
+<!--Age-->
+<label for="age">Age:</label>
+<input type="number" id="age" name="age"
+min="18" max="100"
+step="1"
+placeholder="18"
+required>
+
+<!--Subscription Options-->
+<p>Subscription Type:</p>
+<label>
+    <input type="radio" name="subscription" value="monthly" required>
+Monthly
+</label>
+<label>
+    <input type="radio" name="subscription" value="yearly">
+Yearly
+</label>
+<!--Submit Button-->
+<button type="submit">Submit</button>
+</form>
+</body>
+</html>
