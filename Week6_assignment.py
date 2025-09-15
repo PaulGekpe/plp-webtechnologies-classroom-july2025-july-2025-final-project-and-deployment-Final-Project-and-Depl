@@ -1,78 +1,86 @@
-'''
-Python Libraries Assignment
-Author: Paul Kelechi Gekpe
-Date: September 2025
-Description:
-Demonstrates the use of Python's Standard Library, NumPy, Pandas, and Matplotlib.
-'''
-#---------------
-# 1. Python Standard Library
-#---------------
-import math
-import random
-from datetime import datetime
+# --- Auto-install 'requests' if missing ---
+try:
+    import requests
+except ImportError:
+    import subprocess
+    import sys
+    print("📦 'requests' not found. Installing now...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
+    import requests  # Try again after installing
 
-print("=== Python Standard Library Examples ===")
-# Math module
-number = 49
-print("Square root of {number} is:", math.sqrt(number))
+import os
+from urllib.parse import urlparse
+import hashlib
 
-#Random module
-print("Random number between 1 and 100:", random.randint(1, 100))
+# --- Utility Functions ---
+def is_image_content(response):
+    """Check if the Content-Type header indicates an image."""
+    content_type = response.headers.get("Content-Type", "")
+    return content_type.startswith("image/")
 
-# Datetime module
-current_time = datetime.now()
-print("Current date and time:", current_time.strftime("%Y-%m-%d %H:%M:%S"))
+def file_exists(filepath, content):
+    """Check if a file already exists and has the same content (by MD5 hash)."""
+    if os.path.exists(filepath):
+        with open(filepath, 'rb') as f:
+            existing_hash = hashlib.md5(f.read()).hexdigest()
+        new_hash = hashlib.md5(content).hexdigest()
+        return existing_hash == new_hash
+    return False
 
-#---------------
-# 2. NumPy
-#---------------
-import numpy as np
+def download_image(url):
+    """Download a single image from a URL with safety checks."""
+    try:
+        os.makedirs("Fetched_Images", exist_ok=True)
 
-print("\n=== NumPy Examples ===")
-# Creating a NumPy array
-arr = np.array([10, 20 , 30 , 40 , 50 ])
-print("Array:", arr)
+        # Fetch the image
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
 
-# Perform calculations
-print("Mean:", np.mean(arr))
-print("Standard Deviation:", np.std(arr))
-print("Array multiplied by 2:", arr * 2)
+        # Check Content-Type
+        if not is_image_content(response):
+            print(f"✗ Skipped (Not an image): {url}")
+            return
 
-#---------------
-# 3. Pandas
-#---------------
-import pandas as pd
-print("\n=== Pandas Examples ===")
-# Create a DataFrame
-data = {
-    'Name': ['Alice', 'Bob', 'Charlie', 'Diana'],
-    'Score': [85, 90, 78, 92],
-    'Age': [20, 21, 19, 22]
-}
-df = pd.DataFrame(data)
-print("DataFrame:\n", df)
+        # Check Content-Length (limit to ~5MB for safety)
+        content_length = response.headers.get("Content-Length")
+        if content_length and int(content_length) > 5 * 1024 * 1024:
+            print(f"⚠ Skipped (File too large >5MB): {url}")
+            return
 
-#Filter data
-high_scorers = df[df['Score'] > 80]
-print("\nStudents with scores above 80:\n", high_scorers)
+        # Extract filename
+        parsed_url = urlparse(url)
+        filename = os.path.basename(parsed_url.path) or "downloaded_image.jpg"
+        filepath = os.path.join("Fetched_Images", filename)
 
-#Summary statistics
-print("\nAverage Score:", df['Score'].mean())
+        # Prevent duplicates
+        if file_exists(filepath, response.content):
+            print(f"⚠ Duplicate skipped: {filename}")
+            return
 
-# -----------------------------
-# 4. Matplotlib
-# -----------------------------
-import matplotlib.pyplot as plt
+        # Save the image
+        with open(filepath, 'wb') as f:
+            f.write(response.content)
 
-print("\n=== Matplotlib Example ===")
-# Create a bar chart of scores
-plt.figure(figsize=(6, 4))
-plt.bar(df['Name'], df['Score'], color='skyblue', edgecolor='black')
-plt.title('Student Scores')
-plt.xlabel('Name')
-plt.ylabel('Score')
-plt.ylim(0, 100)
-plt.grid(axis='y', linestyle='--', alpha=0.7)
-plt.tight_layout()
-plt.show()
+        print(f"✓ Successfully fetched: {filename}")
+        print(f"✓ Image saved to {filepath}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"✗ Connection error for {url}: {e}")
+    except Exception as e:
+        print(f"✗ An error occurred for {url}: {e}")
+
+# --- Main Program ---
+def main():
+    print("Welcome to the Ubuntu Image Fetcher")
+    print("A tool for mindfully collecting images from the web\n")
+
+    # Accept multiple URLs
+    urls = input("Please enter image URLs (comma-separated): ").split(",")
+
+    for url in [u.strip() for u in urls if u.strip()]:
+        download_image(url)
+
+    print("\nConnection strengthened. Community enriched.")
+
+if __name__ == "__main__":
+    main()
